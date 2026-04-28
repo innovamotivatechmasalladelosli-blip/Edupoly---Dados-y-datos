@@ -1,40 +1,26 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { 
-  Trophy, 
-  Dice5, 
-  User, 
-  Coins, 
-  BookOpen, 
-  AlertCircle, 
-  CheckCircle2, 
-  XCircle,
-  Volume2,
-  VolumeX,
-  Moon,
-  Sun,
-  GraduationCap
-} from "lucide-react";
 
 //======================================================================
-// CONFIGURACIÓN GLOBAL (Volúmenes y Voz)
+//CONFIGURACIÓN GLOBAL (Volúmenes y Voz)
 //======================================================================
 (window as any).__gameConfig = {
-  musicVol: 0.4, sfxVol: 0.6, voiceVol: 0.8, voiceEnabled: true,
+  musicVol: 0.4,
+  sfxVol: 0.6,
+  voiceVol: 0.8,
+  voiceEnabled: false,
   isMuted: false
 };
 
 //======================================================================
-// MOTOR DE AUDIO
+//MOTOR DE AUDIO Y MÚSICA GENERATIVA
 //======================================================================
 let audioCtx: any = null;
 const initAudio = () => {
   if (!audioCtx) audioCtx = new ((window as any).AudioContext || (window as any).webkitAudioContext)();
   if (audioCtx.state === 'suspended') audioCtx.resume();
+  //Init voz vacía para destrabar el motor en móviles
+  const synth = (window as any).speechSynthesis;
+  if (synth) { const u = new SpeechSynthesisUtterance(""); u.volume = 0; synth.speak(u); }
 };
 
 const playTone = (freq: number, type: string, duration: number, volBase: number, slideFreq: number | null = null) => {
@@ -56,16 +42,123 @@ const playTone = (freq: number, type: string, duration: number, volBase: number,
 
 const sfx = {
   click: () => playTone(600, 'sine', 0.05, 0.1),
-  dice: () => playTone(800, 'square', 0.1, 0.05),
-  correct: () => { playTone(440, 'triangle', 0.1, 0.1); setTimeout(() => playTone(659, 'triangle', 0.3, 0.1), 100); },
-  wrong: () => playTone(150, 'sawtooth', 0.4, 0.1, 100),
-  move: () => playTone(300, 'sine', 0.05, 0.05),
-  win: () => { playTone(523, 'sine', 0.2, 0.1); setTimeout(() => playTone(659, 'sine', 0.2, 0.1), 200); setTimeout(() => playTone(783, 'sine', 0.4, 0.1), 400); }
+  hover: () => playTone(400, 'sine', 0.03, 0.02),
+  coin: () => { playTone(1200, 'sine', 0.1, 0.1); setTimeout(() => playTone(1600, 'sine', 0.15, 0.1), 60); },
+  dice: () => playTone(800, 'square', 0.02, 0.03),
+  correct: () => { playTone(440, 'triangle', 0.1, 0.1); setTimeout(() => playTone(554, 'triangle', 0.1, 0.1), 100); setTimeout(() => playTone(659, 'triangle', 0.3, 0.1), 200); },
+  wrong: () => playTone(250, 'sawtooth', 0.4, 0.1, 100),
+  attack: () => { playTone(150, 'square', 0.4, 0.15, 50); playTone(200, 'sawtooth', 0.4, 0.1, 80); },
+  turn: () => { playTone(500, 'sine', 0.1, 0.1); setTimeout(() => playTone(750, 'sine', 0.2, 0.1), 100); },
+  card: () => playTone(150, 'sawtooth', 0.15, 0.05, 400),
+  win: () => { playTone(440, 'sine', 0.2, 0.1); setTimeout(() => playTone(554, 'sine', 0.2, 0.1), 200); setTimeout(() => playTone(659, 'sine', 0.6, 0.1), 400); },
+  bankrupt: () => { playTone(100, 'sawtooth', 0.8, 0.2, 30); setTimeout(() => playTone(80, 'square', 1.0, 0.2, 20), 400); },
+  magic: () => { playTone(880, 'sine', 0.1, 0.1); setTimeout(() => playTone(1108, 'sine', 0.1, 0.1), 100); setTimeout(() => playTone(1318, 'sine', 0.4, 0.1), 200); },
+  build: () => { playTone(300, 'square', 0.1, 0.1); setTimeout(() => playTone(400, 'square', 0.1, 0.1), 100); setTimeout(() => playTone(500, 'triangle', 0.2, 0.1), 200); }
 };
 
-//======================================================================
-// BANCO DE PREGUNTAS COMPLETO (100 PREGUNTAS DEL DOCUMENTO)
-//======================================================================
+// NARRADOR (Text-to-Speech)
+const narrate = (text: string, priority = false) => {
+  if (!(window as any).__gameConfig.voiceEnabled || (window as any).__gameConfig.isMuted || (window as any).__gameConfig.voiceVol <= 0) return;
+  const synth = (window as any).speechSynthesis;
+  if (!synth) return;
+  if (synth.paused) synth.resume();
+  if (priority) synth.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.volume = (window as any).__gameConfig.voiceVol;
+  const voices = synth.getVoices();
+  const spanishVoice = voices.find(v => v.lang.startsWith('es')) || voices[0];
+  if (spanishVoice) utterance.voice = spanishVoice;
+  utterance.lang = 'es-MX';
+  utterance.rate = 1.1;
+  utterance.pitch = 1.0;
+  if (!priority && synth.speaking) return;
+  synth.speak(utterance);
+};
+
+// MUSIC ENGINE
+const musicEngine = {
+  interval: null as any, step: 0, currentMode: null as any, currentBoard: null as any,
+  play: function(mode: string, board = 'b_classic') {
+    if (this.currentMode === mode && this.currentBoard === board) return;
+    this.currentMode = mode; this.currentBoard = board;
+    clearInterval(this.interval); this.step = 0;
+    if (mode === 'menu') {
+      const scale = [220, 261.63, 329.63, 392.00, 440, 392.00, 329.63, 261.63];
+      this.interval = setInterval(() => {
+        const v = (window as any).__gameConfig.musicVol;
+        if (!(window as any).__gameConfig.isMuted && audioCtx && v > 0) playTone(scale[this.step % scale.length], 'sine', 1.5, 0.05 * v);
+        this.step++;
+      }, 800);
+    } else if (mode === 'game') {
+      let bass, lead, bassType, leadType, speed;
+      if (board === 'b_neon') { bass = [65.41, 0, 65.41, 77.78, 65.41, 0, 58.27, 73.42]; lead = [0, 523.25, 0, 659.25, 783.99, 0, 659.25, 0]; bassType = 'sawtooth'; leadType = 'square'; speed = 250; }
+      else if (board === 'b_forest') { bass = [130.81, 146.83, 164.81, 146.83]; lead = [523.25, 0, 659.25, 0]; bassType = 'triangle'; leadType = 'sine'; speed = 500; }
+      else if (board === 'b_lava') { bass = [41.20, 43.65, 41.20, 49.00, 36.71, 0, 41.20, 0]; lead = [0, 0, 329.63, 0, 0, 0, 311.13, 0]; bassType = 'sawtooth'; leadType = 'triangle'; speed = 450; }
+      else { bass = [110, 110, 130.81, 110, 146.83, 130.81, 110, 82.41]; lead = [0, 440, 0, 523.25, 659.25, 0, 523.25, 0]; bassType = 'triangle'; leadType = 'square'; speed = 350; }
+      this.interval = setInterval(() => {
+        const v = (window as any).__gameConfig.musicVol;
+        if (!(window as any).__gameConfig.isMuted && audioCtx && v > 0) {
+          if (bass[this.step % bass.length]) playTone(bass[this.step % bass.length], bassType, 0.3, 0.08 * v);
+          if (lead[this.step % lead.length]) playTone(lead[this.step % lead.length], leadType, 0.2, 0.03 * v);
+        }
+        this.step++;
+      }, speed);
+    }
+  },
+  stop: function() { clearInterval(this.interval); this.currentMode = null; }
+};
+
+//--- ESTILOS GLOBALES ---
+const GlobalStyles = ({ theme }: { theme: string }) => (
+  <style>{`
+    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap');
+    :root {
+      --bg-color: ${theme === 'dark' ? '#0f172a' : '#f0fdf4'};
+      --text-color: ${theme === 'dark' ? '#f8fafc' : '#1e293b'};
+      --panel-bg: ${theme === 'dark' ? 'rgba(30, 41, 59, 0.75)' : 'rgba(255, 255, 255, 0.85)'};
+      --panel-border: ${theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'};
+      --panel-shadow: ${theme === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.15)'};
+      --accent-color: ${theme === 'dark' ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.05)'};
+    }
+    body { font-family: 'Nunito', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow: hidden; margin: 0; padding: 0; touch-action: none; transition: background-color 0.5s ease, color 0.5s ease; }
+    @keyframes title-wave { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-8px) rotate(2deg); } }
+    @keyframes pop-in { 0% { transform: scale(0.8) translateY(20px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    @keyframes float-slow { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-15px) rotate(5deg); } }
+    @keyframes glow-pulse { 0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.3), inset 0 0 10px rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.5); } 50% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.7), inset 0 0 20px rgba(16, 185, 129, 0.4); border-color: rgba(16, 185, 129, 1); } }
+    @keyframes throw { 0% { transform: translateY(0) scale(1); } 50% { transform: translateY(-40px) scale(1.1) rotate(15deg); } 100% { transform: translateY(0) scale(1) rotate(0deg); } }
+    .title-anim { animation: title-wave 4s ease-in-out infinite; } .pop-in { animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    .float-anim { animation: float 4s ease-in-out infinite; } .float-slow { animation: float-slow 6s ease-in-out infinite; }
+    .turn-glow { animation: glow-pulse 2s infinite; } .anim-throw { animation: throw 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+    .anime-speed-lines { background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0.1) 0deg 5deg, transparent 5deg 15deg); animation: spin-speed 1.5s linear infinite; }
+    @keyframes spin-speed { 100% { transform: rotate(360deg); } }
+    .glass-panel { background: var(--panel-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--panel-border); box-shadow: 0 15px 35px var(--panel-shadow); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+    .inner-module { background: var(--accent-color); border: 1px solid var(--panel-border); }
+    .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .mask-linear-right { -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%); mask-image: linear-gradient(to right, black 85%, transparent 100%); }
+    .uno-card { background-size: 200% 200%; box-shadow: -5px 10px 20px rgba(0,0,0,0.3), inset 0 0 0 6px white; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); color: white; }
+    .uno-card-inner { background: rgba(255,255,255,0.15); transform: skewY(-10deg); box-shadow: inset 0 0 20px rgba(0,0,0,0.1); }
+    .custom-scroll::-webkit-scrollbar { width: 8px; } .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; } .custom-scroll::-webkit-scrollbar-thumb { background: rgba(16,185,129,0.5); border-radius: 10px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(16,185,129,0.8); }
+    input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #10b981; cursor: pointer; margin-top: -8px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+    input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: rgba(255,255,255,0.2); border-radius: 10px; border: 1px solid rgba(0,0,0,0.1); }
+    .light-theme input[type=range]::-webkit-slider-runnable-track { background: rgba(0,0,0,0.1); }
+  `}</style>
+);
+
+const COLOR_MAP: any = {
+  'bg-emerald-400': '#34d399', 'bg-emerald-500': '#10b981', 'bg-rose-500': '#f43f5e',
+  'bg-blue-400': '#60a5fa', 'bg-blue-500': '#3b82f6', 'bg-teal-400': '#2dd4bf',
+  'bg-indigo-400': '#818cf8', 'bg-indigo-500': '#6366f1', 'bg-slate-600': '#475569', 'bg-slate-800':
+  '#1e293b', 'bg-stone-400': '#a8a29e', 'bg-orange-400': '#fb923c',
+  'bg-zinc-700': '#3f3f46', 'bg-amber-400': '#fbbf24', 'bg-amber-500': '#f59e0b', 'bg-amber-600':
+  '#d97706', 'bg-sky-500': '#0ea5e9', 'bg-yellow-400': '#facc15',
+  'bg-yellow-500': '#eab308', 'bg-pink-400': '#f472b6', 'bg-pink-500': '#ec4899', 'bg-purple-500':
+  '#a855f7', 'bg-lime-500': '#84cc16', 'bg-red-500': '#ef4444',
+  'bg-cyan-400': '#22d3ee', 'bg-cyan-500': '#06b6d4', 'bg-white': '#ffffff', 'bg-black': '#000000'
+};
+
 const QUESTION_BANK = [
   // BLOQUE 1: ORTOGRAFÍA Y ACENTUACIÓN
   { q: "¿Qué tipo de palabra es 'canción' según su acento?", options: ["Aguda", "Grave", "Esdrújula", "Sobreesdrújula"], a: "Aguda", tipo: "Ortografía" },
@@ -190,33 +283,18 @@ const QUESTION_BANK = [
   { q: "¿A qué autor pertenece la obra 'Don Quijote de la Mancha'?", options: ["Miguel de Cervantes", "Lope de Vega", "Garcilaso de la Vega", "Francisco de Quevedo"], a: "Miguel de Cervantes", tipo: "Pregunta Especial ⭐" },
 ];
 
-//======================================================================
-// DATOS DEL TABLERO
-//======================================================================
-const BOARD_SIZE = 20;
-const BOARD_DATA = Array.from({ length: BOARD_SIZE }, (_, i) => {
+const BOARD_DATA = Array.from({ length: 20 }, (_, i) => {
   if (i === 0) return { id: 0, name: "INICIO", type: "start", color: "bg-emerald-500", icon: "🏁" };
   if (i === 5) return { id: 5, name: "BIBLIOTECA", type: "jail", color: "bg-slate-700", icon: "🏛️" };
   if (i === 10) return { id: 10, name: "EXAMEN", type: "exam", color: "bg-amber-500", icon: "📝" };
   if (i === 15) return { id: 15, name: "SUERTE", type: "chance", color: "bg-purple-500", icon: "🎲" };
-  
   const colors = ["bg-blue-400", "bg-red-400", "bg-green-400", "bg-yellow-400", "bg-pink-400"];
-  return { 
-    id: i, 
-    name: `Casilla ${i}`, 
-    type: "property", 
-    color: colors[i % colors.length], 
-    icon: "📖",
-    price: 50 + (i * 10)
-  };
+  return { id: i, name: `Casilla ${i}`, type: "property", color: colors[i % colors.length], icon: "📖", price: 50 + (i * 10) };
 });
 
-//======================================================================
-// COMPONENTE PRINCIPAL
-//======================================================================
 export default function Game() {
-  const [gameState, setGameState] = useState<'menu' | 'playing' | 'gameover'>('menu');
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [gameState, setGameState] = useState<'menu' | 'playing'>('menu');
+  const [theme, setTheme] = useState('dark');
   const [players, setPlayers] = useState([
     { id: 1, name: "Jugador 1", pos: 0, money: 1000, color: "#10b981", icon: "👨‍🎓" },
     { id: 2, name: "Jugador 2", pos: 0, money: 1000, color: "#3b82f6", icon: "👩‍🎓" }
@@ -226,277 +304,105 @@ export default function Game() {
   const [isRolling, setIsRolling] = useState(false);
   const [showQuestion, setShowQuestion] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState<any>(null);
-  const [message, setMessage] = useState("¡Bienvenidos a Examen-Poly!");
   const [history, setHistory] = useState<string[]>([]);
 
   useEffect(() => {
     initAudio();
+    musicEngine.play('menu');
   }, []);
-
-  const addHistory = (msg: string) => {
-    setHistory(prev => [msg, ...prev].slice(0, 10));
-    setMessage(msg);
-  };
 
   const rollDice = () => {
     if (isRolling || showQuestion) return;
     sfx.dice();
     setIsRolling(true);
-    
     setTimeout(() => {
       const roll = Math.floor(Math.random() * 6) + 1;
       setDiceValue(roll);
       setIsRolling(false);
-      movePlayer(roll);
+      const newPlayers = [...players];
+      const p = newPlayers[currentPlayerIdx];
+      let newPos = (p.pos + roll) % 20;
+      if (newPos < p.pos) p.money += 200;
+      p.pos = newPos;
+      setPlayers(newPlayers);
+      setCurrentQuestion(QUESTION_BANK[Math.floor(Math.random() * QUESTION_BANK.length)]);
+      setShowQuestion(true);
     }, 600);
   };
 
-  const movePlayer = (steps: number) => {
+  const handleAnswer = (opt: string) => {
+    const correct = opt === currentQuestion.a;
     const newPlayers = [...players];
-    const player = newPlayers[currentPlayerIdx];
-    let newPos = (player.pos + steps) % BOARD_SIZE;
-    
-    // Si pasa por el inicio
-    if (newPos < player.pos) {
-      player.money += 200;
-      addHistory(`${player.name} pasó por el inicio y ganó $200`);
-    }
-    
-    player.pos = newPos;
-    setPlayers(newPlayers);
-    sfx.move();
-    
-    handleLand(newPos);
-  };
-
-  const handleLand = (pos: number) => {
-    const tile = BOARD_DATA[pos];
-    const question = QUESTION_BANK[Math.floor(Math.random() * QUESTION_BANK.length)];
-    setCurrentQuestion(question);
-    
-    setTimeout(() => {
-      setShowQuestion(true);
-    }, 500);
-  };
-
-  const handleAnswer = (option: string) => {
-    const isCorrect = option === currentQuestion.a;
-    const newPlayers = [...players];
-    const player = newPlayers[currentPlayerIdx];
-    
-    if (isCorrect) {
-      sfx.correct();
-      player.money += 100;
-      addHistory(`¡Correcto! ${player.name} ganó $100`);
-    } else {
-      sfx.wrong();
-      player.money -= 50;
-      addHistory(`Incorrecto. ${player.name} perdió $50. La respuesta era: ${currentQuestion.a}`);
-    }
-    
+    const p = newPlayers[currentPlayerIdx];
+    if (correct) { sfx.correct(); p.money += 100; setHistory([`¡Correcto! ${p.name} +$100`, ...history]); }
+    else { sfx.wrong(); p.money -= 50; setHistory([`Incorrecto. ${p.name} -$50`, ...history]); }
     setPlayers(newPlayers);
     setShowQuestion(false);
-    
-    // Siguiente turno
-    setCurrentPlayerIdx((currentPlayerIdx + 1) % players.length);
+    setCurrentPlayerIdx((currentPlayerIdx + 1) % 2);
   };
 
-  if (gameState === 'menu') {
-    return (
-      <div className={`w-full h-screen flex flex-col items-center justify-center transition-colors duration-500 ${theme === 'dark' ? 'bg-slate-950 text-white' : 'bg-emerald-50 text-slate-900'}`}>
-        <motion.div 
-          initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          className="text-center"
-        >
-          <GraduationCap size={120} className="mx-auto mb-6 text-emerald-500" />
-          <h1 className="text-7xl font-black mb-2 tracking-tighter">
-            EXAMEN<span className="text-emerald-500">-POLY</span>
-          </h1>
-          <p className="text-xl opacity-60 mb-12">Estudia para el COMIPEMS/CENEVAL jugando</p>
-          
-          <div className="flex gap-4 justify-center">
-            <Button 
-              size="lg" 
-              onClick={() => { sfx.click(); setGameState('playing'); }}
-              className="bg-emerald-600 hover:bg-emerald-500 text-white px-12 py-8 text-2xl rounded-2xl shadow-xl shadow-emerald-900/20"
-            >
-              ¡EMPEZAR!
-            </Button>
-            <Button 
-              variant="outline" 
-              size="icon"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="w-16 h-16 rounded-2xl"
-            >
-              {theme === 'dark' ? <Sun /> : <Moon />}
-            </Button>
-          </div>
-        </motion.div>
-      </div>
-    );
-  }
-
   return (
-    <div className={`w-full h-screen flex overflow-hidden transition-colors duration-500 ${theme === 'dark' ? 'bg-slate-950 text-white' : 'bg-slate-50 text-slate-900'}`}>
-      {/* PANEL IZQUIERDO: ESTADÍSTICAS */}
-      <div className="w-80 p-6 border-r border-white/10 flex flex-col gap-6">
-        <div className="flex items-center gap-3 mb-4">
-          <GraduationCap className="text-emerald-500" />
-          <h2 className="text-2xl font-bold">EXAMEN-POLY</h2>
+    <div className="w-full h-screen overflow-hidden flex flex-col">
+      <GlobalStyles theme={theme} />
+      {gameState === 'menu' ? (
+        <div className="flex-1 flex flex-col items-center justify-center">
+          <h1 className="text-7xl font-black mb-4 title-anim">EXAMEN<span className="text-emerald-500">-POLY</span></h1>
+          <Button size="lg" onClick={() => { sfx.magic(); setGameState('playing'); musicEngine.play('game'); }} className="bg-emerald-600 hover:bg-emerald-500 text-white px-12 py-8 text-2xl rounded-2xl">¡EMPEZAR!</Button>
         </div>
-
-        {players.map((p, idx) => (
-          <Card key={p.id} className={`p-4 border-2 transition-all ${currentPlayerIdx === idx ? 'border-emerald-500 scale-105 shadow-lg' : 'border-transparent opacity-70'}`}>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style={{ backgroundColor: p.color }}>
-                {p.icon}
-              </div>
-              <div>
-                <p className="font-bold">{p.name}</p>
-                <div className="flex items-center gap-1 text-emerald-500 font-mono">
-                  <Coins size={14} />
-                  <span>${p.money}</span>
+      ) : (
+        <div className="flex-1 flex">
+          <div className="w-80 p-6 border-r border-white/10 flex flex-col gap-4">
+            <h2 className="text-2xl font-bold mb-4">ESTADÍSTICAS</h2>
+            {players.map((p, i) => (
+              <Card key={p.id} className={`p-4 border-2 ${currentPlayerIdx === i ? 'border-emerald-500' : 'border-transparent'}`}>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center text-xl" style={{ backgroundColor: p.color }}>{p.icon}</div>
+                  <div><p className="font-bold">{p.name}</p><p className="text-emerald-500 font-mono">${p.money}</p></div>
                 </div>
+              </Card>
+            ))}
+            <div className="mt-auto h-48 overflow-y-auto custom-scroll bg-black/20 p-3 rounded-xl">
+              {history.map((h, i) => <p key={i} className="text-xs mb-1 opacity-70">{h}</p>)}
+            </div>
+          </div>
+          <div className="flex-1 relative flex items-center justify-center">
+            <div className="grid grid-cols-6 grid-rows-6 w-[600px] h-[600px] gap-2">
+              {BOARD_DATA.map((tile, i) => {
+                let row = 0, col = 0;
+                if (i < 6) { row = 0; col = i; } else if (i < 11) { row = i - 5; col = 5; } else if (i < 16) { row = 5; col = 5 - (i - 10); } else { row = 5 - (i - 15); col = 0; }
+                return (
+                  <div key={tile.id} style={{ gridRow: row + 1, gridColumn: col + 1 }} className={`rounded-xl ${tile.color} flex flex-col items-center justify-center p-1 text-center relative shadow-inner`}>
+                    <span className="text-xl">{tile.icon}</span>
+                    <span className="text-[8px] font-bold uppercase">{tile.name}</span>
+                    <div className="absolute bottom-1 flex gap-1">
+                      {players.filter(p => p.pos === tile.id).map(p => <div key={p.id} className="w-5 h-5 rounded-full border border-white flex items-center justify-center text-[10px]" style={{ backgroundColor: p.color }}>{p.icon}</div>)}
+                    </div>
+                  </div>
+                );
+              })}
+              <div className="col-start-2 col-end-6 row-start-2 row-end-6 flex flex-col items-center justify-center bg-black/5 rounded-3xl border-2 border-dashed border-white/10">
+                {!showQuestion ? (
+                  <div className="text-center">
+                    <div className="text-sm font-bold opacity-40 mb-4 uppercase">Turno de: {players[currentPlayerIdx].name}</div>
+                    <div className="w-20 h-20 bg-white text-slate-900 rounded-2xl shadow-2xl flex items-center justify-center text-4xl font-black mx-auto mb-6 cursor-pointer" onClick={rollDice}>{isRolling ? "?" : (diceValue || "🎲")}</div>
+                    <Button disabled={isRolling} onClick={rollDice} className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-8 py-4 rounded-xl">LANZAR DADOS</Button>
+                  </div>
+                ) : (
+                  <div className="w-full h-full p-6 flex flex-col">
+                    <Badge className="mb-2 self-start bg-emerald-500">{currentQuestion.tipo}</Badge>
+                    <h3 className="text-lg font-bold mb-4 leading-tight">{currentQuestion.q}</h3>
+                    <div className="grid grid-cols-1 gap-2">
+                      {currentQuestion.options.map((opt: string, i: number) => (
+                        <Button key={i} variant="outline" className="justify-start text-left h-auto py-2 px-4 hover:bg-emerald-500/20 hover:border-emerald-500" onClick={() => handleAnswer(opt)}>{opt}</Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-          </Card>
-        ))}
-
-        <div className="mt-auto">
-          <h3 className="text-sm font-bold opacity-50 mb-2 uppercase tracking-widest">Historial</h3>
-          <ScrollArea className="h-48 rounded-xl bg-black/20 p-3">
-            {history.map((h, i) => (
-              <p key={i} className="text-xs mb-2 border-b border-white/5 pb-1 last:border-0">{h}</p>
-            ))}
-          </ScrollArea>
-        </div>
-      </div>
-
-      {/* CENTRO: TABLERO */}
-      <div className="flex-1 relative flex items-center justify-center p-10">
-        <div className="grid grid-cols-6 grid-rows-6 w-[600px] h-[600px] gap-2">
-          {/* Renderizar casillas en forma de espiral/borde */}
-          {BOARD_DATA.map((tile, i) => {
-            // Lógica simple para posicionar en el borde de 6x6
-            let row = 0, col = 0;
-            if (i < 6) { row = 0; col = i; }
-            else if (i < 11) { row = i - 5; col = 5; }
-            else if (i < 16) { row = 5; col = 5 - (i - 10); }
-            else { row = 5 - (i - 15); col = 0; }
-
-            return (
-              <div 
-                key={tile.id}
-                style={{ gridRow: row + 1, gridColumn: col + 1 }}
-                className={`rounded-xl ${tile.color} flex flex-col items-center justify-center p-2 text-center relative shadow-inner border-b-4 border-black/20`}
-              >
-                <span className="text-2xl mb-1">{tile.icon}</span>
-                <span className="text-[10px] font-black leading-tight uppercase">{tile.name}</span>
-                
-                {/* Jugadores en esta casilla */}
-                <div className="absolute bottom-1 flex gap-1">
-                  {players.filter(p => p.pos === tile.id).map(p => (
-                    <motion.div 
-                      layoutId={`player-${p.id}`}
-                      key={p.id} 
-                      className="w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-xs"
-                      style={{ backgroundColor: p.color }}
-                    >
-                      {p.icon}
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-
-          {/* Centro del tablero */}
-          <div className="grid-start-2 grid-end-6 grid-row-start-2 grid-row-end-6 col-start-2 col-end-6 row-start-2 row-end-6 flex flex-col items-center justify-center bg-black/5 rounded-3xl border-2 border-dashed border-white/10">
-            <AnimatePresence mode="wait">
-              {!showQuestion ? (
-                <motion.div 
-                  initial={{ opacity: 0 }} 
-                  animate={{ opacity: 1 }} 
-                  exit={{ opacity: 0 }}
-                  className="text-center"
-                >
-                  <div className="text-sm font-bold opacity-40 mb-4">TURNO DE: {players[currentPlayerIdx].name}</div>
-                  <motion.div 
-                    animate={isRolling ? { rotate: [0, 90, 180, 270, 360], scale: [1, 1.2, 1] } : {}}
-                    transition={{ repeat: isRolling ? Infinity : 0, duration: 0.2 }}
-                    className="w-24 h-24 bg-white text-slate-900 rounded-3xl shadow-2xl flex items-center justify-center text-5xl font-black mx-auto mb-6 cursor-pointer hover:scale-105 transition-transform"
-                    onClick={rollDice}
-                  >
-                    {isRolling ? "?" : (diceValue || <Dice5 size={48} />)}
-                  </motion.div>
-                  <Button 
-                    disabled={isRolling}
-                    onClick={rollDice}
-                    className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-8 py-6 rounded-xl"
-                  >
-                    LANZAR DADOS
-                  </Button>
-                </motion.div>
-              ) : (
-                <motion.div 
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  className="w-full h-full p-6 flex flex-col"
-                >
-                  <Badge className="mb-2 self-start bg-emerald-500">{currentQuestion.tipo}</Badge>
-                  <h3 className="text-xl font-bold mb-6 leading-tight">{currentQuestion.q}</h3>
-                  <div className="grid grid-cols-1 gap-2">
-                    {currentQuestion.options.map((opt: string, i: number) => (
-                      <Button 
-                        key={i}
-                        variant="outline"
-                        className="justify-start text-left h-auto py-3 px-4 hover:bg-emerald-500/20 hover:border-emerald-500 transition-all"
-                        onClick={() => handleAnswer(opt)}
-                      >
-                        <span className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center mr-3 text-xs">{String.fromCharCode(65 + i)}</span>
-                        {opt}
-                      </Button>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
         </div>
-      </div>
-
-      {/* PANEL DERECHO: INFO */}
-      <div className="w-80 p-6 border-l border-white/10 flex flex-col gap-6">
-        <Card className="p-4 bg-emerald-500/10 border-emerald-500/20">
-          <div className="flex items-center gap-2 text-emerald-500 mb-2">
-            <AlertCircle size={18} />
-            <span className="font-bold text-sm">¿Cómo jugar?</span>
-          </div>
-          <p className="text-xs opacity-70 leading-relaxed">
-            Lanza los dados para moverte. Cada casilla tiene una pregunta. 
-            <br/><br/>
-            ✅ <b>Correcto:</b> +$100
-            <br/>
-            ❌ <b>Incorrecto:</b> -$50
-            <br/><br/>
-            ¡Gana el primero en llegar a $2000 o el que tenga más dinero al final!
-          </p>
-        </Card>
-
-        <div className="flex flex-col gap-2">
-          <Button variant="ghost" className="justify-start gap-2" onClick={() => setGameState('menu')}>
-            <BookOpen size={18} /> Salir al Menú
-          </Button>
-          <Button variant="ghost" className="justify-start gap-2" onClick={() => {
-            (window as any).__gameConfig.isMuted = !(window as any).__gameConfig.isMuted;
-            setTheme(theme); // Forzar re-render
-          }}>
-            {(window as any).__gameConfig.isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-            Sonido: {(window as any).__gameConfig.isMuted ? "OFF" : "ON"}
-          </Button>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
