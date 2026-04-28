@@ -64,7 +64,7 @@ const sfx = {
 };
 
 //======================================================================
-// BANCO DE PREGUNTAS (Documento + Especiales)
+// BANCO DE PREGUNTAS COMPLETO (100 PREGUNTAS DEL DOCUMENTO)
 //======================================================================
 const QUESTION_BANK = [
   // BLOQUE 1: ORTOGRAFÍA Y ACENTUACIÓN
@@ -78,7 +78,17 @@ const QUESTION_BANK = [
   { q: "Escribe el plural de la palabra 'luz'.", options: ["Luces", "Luzes", "Lucs", "Luzs"], a: "Luces", tipo: "Ortografía" },
   { q: "¿Cuál es la forma correcta?", options: ["Hubo muchos problemas", "Hubieron muchos problemas", "Habían muchos problemas", "Hicieron muchos problemas"], a: "Hubo muchos problemas", tipo: "Ortografía" },
   { q: "¿Lleva tilde la palabra 'fue'?", options: ["No, es monosílabo", "Sí, siempre", "Solo en preguntas", "Depende del contexto"], a: "No, es monosílabo", tipo: "Ortografía" },
-  
+  { q: "¿Cuál es el sinónimo de 'abundante'?", options: ["Copioso", "Escaso", "Pequeño", "Raro"], a: "Copioso", tipo: "Ortografía" },
+  { q: "¿Qué tipo de palabra es 'árbol'?", options: ["Grave o llana", "Aguda", "Esdrújula", "Sobreesdrújula"], a: "Grave o llana", tipo: "Ortografía" },
+  { q: "¿Cómo se llama el signo que indica una pregunta?", options: ["Signo de interrogación", "Signo de admiración", "Punto y coma", "Guion"], a: "Signo de interrogación", tipo: "Ortografía" },
+  { q: "¿Cuándo se usa la letra 'H'?", options: ["Palabras que empiezan por hie-, hue-, hui-", "Siempre antes de vocal", "Al final de todas las palabras", "Nunca se usa"], a: "Palabras que empiezan por hie-, hue-, hui-", tipo: "Ortografía" },
+  { q: "¿Qué palabra es un palíndromo?", options: ["Reconocer", "Hola", "Adiós", "Juego"], a: "Reconocer", tipo: "Ortografía" },
+  { q: "¿Se escribe 'aser' o 'hacer'?", options: ["Hacer", "Aser", "Haser", "Acer"], a: "Hacer", tipo: "Ortografía" },
+  { q: "¿Qué acento se usa para diferenciar palabras que se escriben igual?", options: ["Acento diacrítico", "Acento ortográfico", "Acento prosódico", "Acento tónico"], a: "Acento diacrítico", tipo: "Ortografía" },
+  { q: "¿La palabra 'examen' lleva tilde?", options: ["No", "Sí", "Solo en plural", "Depende del país"], a: "No", tipo: "Ortografía" },
+  { q: "¿Cuál es la diferencia entre 'ay', 'hay' y 'ahí'?", options: ["Exclamación, haber, lugar", "Lugar, haber, exclamación", "Haber, lugar, exclamación", "No hay diferencia"], a: "Exclamación, haber, lugar", tipo: "Ortografía" },
+  { q: "¿Qué palabra está bien escrita?", options: ["A través", "Atravez", "A traves", "Através"], a: "A través", tipo: "Ortografía" },
+
   // BLOQUE 2: GRAMÁTICA Y SINTAXIS
   { q: "¿Cuál es el núcleo del sujeto en: 'El joven programador terminó el código'?", options: ["Programador", "Joven", "Terminó", "Código"], a: "Programador", tipo: "Gramática" },
   { q: "¿Qué es un adjetivo?", options: ["Describe al sustantivo", "Indica una acción", "Sustituye al nombre", "Une oraciones"], a: "Describe al sustantivo", tipo: "Gramática" },
@@ -90,6 +100,82 @@ const QUESTION_BANK = [
   { q: "¿Cuál es el tiempo verbal de 'yo comeré'?", options: ["Futuro simple", "Presente", "Pasado", "Copretérito"], a: "Futuro simple", tipo: "Gramática" },
   { q: "¿Qué es un sustantivo propio?", options: ["Nombre específico", "Nombre general", "Una acción", "Una cualidad"], a: "Nombre específico", tipo: "Gramática" },
   { q: "¿Cuál es el sujeto tácito en 'Comimos pizza'?", options: ["Nosotros", "Ellos", "Yo", "Ustedes"], a: "Nosotros", tipo: "Gramática" },
+  { q: "¿Qué es una oración simple?", options: ["La que tiene un solo verbo conjugado", "La que no tiene sujeto", "La que tiene dos verbos", "La que es muy corta"], a: "La que tiene un solo verbo conjugado", tipo: "Gramática" },
+  { q: "¿Qué función cumple la preposición 'de' en 'la casa de madera'?", options: ["Indica pertenencia o material", "Indica lugar", "Indica tiempo", "Indica modo"], a: "Indica pertenencia o material", tipo: "Gramática" },
+  { q: "¿Cuál es el participio del verbo 'escribir'?", options: ["Escrito", "Escribido", "Escribiendo", "Escriba"], a: "Escrito", tipo: "Gramática" },
+  { q: "¿Qué es un pronombre?", options: ["Palabra que sustituye al sustantivo", "Palabra que describe", "Palabra que indica acción", "Palabra que une"], a: "Palabra que sustituye al sustantivo", tipo: "Gramática" },
+  { q: "¿Cuál es el gerundio del verbo 'leer'?", options: ["Leyendo", "Leído", "Leerá", "Leía"], a: "Leyendo", tipo: "Gramática" },
+  { q: "¿Qué es un nexo?", options: ["Palabra que une oraciones o ideas", "Palabra que describe", "El núcleo del sujeto", "Un tipo de acento"], a: "Palabra que une oraciones o ideas", tipo: "Gramática" },
+  { q: "Identifica el modo verbal en '¡Cierra la puerta!':", options: ["Imperativo", "Indicativo", "Subjuntivo", "Infinitivo"], a: "Imperativo", tipo: "Gramática" },
+  { q: "¿Qué es una oración coordinada?", options: ["Dos oraciones independientes unidas por un nexo", "Una oración dentro de otra", "Una oración sin verbo", "Una oración con sujeto tácito"], a: "Dos oraciones independientes unidas por un nexo", tipo: "Gramática" },
+  { q: "¿Cuál es la diferencia entre sujeto y predicado?", options: ["Quién realiza la acción vs la acción misma", "El nombre vs el adjetivo", "El principio vs el final", "No hay diferencia"], a: "Quién realiza la acción vs la acción misma", tipo: "Gramática" },
+  { q: "¿Qué es un artículo definido?", options: ["El, la, los, las", "Un, una, unos, unas", "Yo, tú, él", "Mío, tuyo, suyo"], a: "El, la, los, las", tipo: "Gramática" },
+
+  // BLOQUE 3: COMPRENSIÓN LECTORA
+  { q: "¿Cuál es la función principal de un texto informativo?", options: ["Transmitir datos de manera objetiva", "Contar una historia ficticia", "Expresar sentimientos", "Convencer al lector"], a: "Transmitir datos de manera objetiva", tipo: "Comprensión Lectora" },
+  { q: "¿Qué es una paráfrasis?", options: ["Explicar un texto con tus propias palabras", "Copiar el texto tal cual", "Resumir solo el final", "Cambiar el idioma"], a: "Explicar un texto con tus propias palabras", tipo: "Comprensión Lectora" },
+  { q: "¿Qué parte del texto resume el contenido al principio?", options: ["Introducción", "Desarrollo", "Conclusión", "Índice"], a: "Introducción", tipo: "Comprensión Lectora" },
+  { q: "¿Cuál es el objetivo de un texto argumentativo?", options: ["Persuadir o convencer", "Informar sobre el clima", "Enseñar a cocinar", "Describir un paisaje"], a: "Persuadir o convencer", tipo: "Comprensión Lectora" },
+  { q: "¿Qué es una idea principal?", options: ["La información más importante", "El título del libro", "El nombre del autor", "La última frase"], a: "La información más importante", tipo: "Comprensión Lectora" },
+  { q: "¿Qué tipo de texto es una noticia?", options: ["Periodístico / Informativo", "Literario / Poético", "Científico / Técnico", "Dramático"], a: "Periodístico / Informativo", tipo: "Comprensión Lectora" },
+  { q: "¿A qué género pertenece una novela?", options: ["Género narrativo", "Género lírico", "Género dramático", "Género didáctico"], a: "Género narrativo", tipo: "Comprensión Lectora" },
+  { q: "¿Qué es una ficha bibliográfica?", options: ["Documento que registra datos de un libro", "Una marca en la página", "El resumen de la trama", "La biografía del autor"], a: "Documento que registra datos de un libro", tipo: "Comprensión Lectora" },
+  { q: "¿Qué función de la lengua predomina en un poema?", options: ["Poética o estética", "Apelativa", "Referencial", "Metalingüística"], a: "Poética o estética", tipo: "Comprensión Lectora" },
+  { q: "¿Qué es un desenlace?", options: ["La parte final donde se resuelve el conflicto", "El inicio de la historia", "El momento de mayor tensión", "La presentación de personajes"], a: "La parte final donde se resuelve el conflicto", tipo: "Comprensión Lectora" },
+  { q: "¿Qué es el subtexto?", options: ["Lo que el autor sugiere pero no dice", "El título secundario", "Las notas al pie", "El texto traducido"], a: "Lo que el autor sugiere pero no dice", tipo: "Comprensión Lectora" },
+  { q: "¿Qué es una analogía?", options: ["Relación de semejanza entre cosas distintas", "Una contradicción", "Un tipo de rima", "Un personaje principal"], a: "Relación de semejanza entre cosas distintas", tipo: "Comprensión Lectora" },
+  { q: "¿Cuál es la función apelativa de la lengua?", options: ["Influir en el receptor", "Informar sobre hechos", "Expresar emociones", "Hablar sobre el lenguaje"], a: "Influir en el receptor", tipo: "Comprensión Lectora" },
+  { q: "¿Qué es un modismo?", options: ["Expresión propia que no se traduce literal", "Una palabra nueva", "Un error gramatical", "Un tipo de acento"], a: "Expresión propia que no se traduce literal", tipo: "Comprensión Lectora" },
+  { q: "¿Qué tipo de texto utiliza diálogos y acotaciones?", options: ["Texto dramático o teatral", "Ensayo", "Poema", "Noticia"], a: "Texto dramático o teatral", tipo: "Comprensión Lectora" },
+  { q: "¿Qué es un neologismo?", options: ["Una palabra nueva en una lengua", "Una palabra antigua", "Un insulto", "Un nombre propio"], a: "Una palabra nueva en una lengua", tipo: "Comprensión Lectora" },
+  { q: "¿Cuál es el orden cronológico en una narración?", options: ["Planteamiento, nudo y desenlace", "Nudo, desenlace, planteamiento", "Desenlace, nudo, planteamiento", "No tiene orden"], a: "Planteamiento, nudo y desenlace", tipo: "Comprensión Lectora" },
+  { q: "¿Qué es un prefijo?", options: ["Partícula al principio de una palabra", "Partícula al final de una palabra", "El acento de la palabra", "La raíz de la palabra"], a: "Partícula al principio de una palabra", tipo: "Comprensión Lectora" },
+  { q: "¿Para qué sirven las comillas en una cita?", options: ["Indicar texto de otro autor", "Indicar que es importante", "Indicar que es mentira", "Indicar un grito"], a: "Indicar texto de otro autor", tipo: "Comprensión Lectora" },
+  { q: "¿Qué es una metáfora?", options: ["Identifica término real con imaginario", "Una exageración", "Una comparación con 'como'", "Un sonido escrito"], a: "Identifica término real con imaginario", tipo: "Comprensión Lectora" },
+
+  // BLOQUE 4: HABILIDAD VERBAL
+  { q: "Analogía: 'Aleta es a pez, como brazo es a...'", options: ["Humano", "Perro", "Pájaro", "Avión"], a: "Humano", tipo: "Habilidad Verbal" },
+  { q: "¿Cuál es el antónimo de 'altruista'?", options: ["Egoísta", "Generoso", "Amable", "Rápido"], a: "Egoísta", tipo: "Habilidad Verbal" },
+  { q: "¿Qué significa la palabra 'ambiguo'?", options: ["Que puede entenderse de varias formas", "Que es muy claro", "Que es antiguo", "Que es grande"], a: "Que puede entenderse de varias formas", tipo: "Habilidad Verbal" },
+  { q: "Sinónimo de 'escuchar':", options: ["Oír / Atender", "Mirar", "Hablar", "Caminar"], a: "Oír / Atender", tipo: "Habilidad Verbal" },
+  { q: "Antónimo de 'guerra':", options: ["Paz", "Batalla", "Conflicto", "Odio"], a: "Paz", tipo: "Habilidad Verbal" },
+  { q: "¿Qué es un homófono?", options: ["Suenan igual, escritura diferente", "Significan lo mismo", "Significan lo opuesto", "Tienen la misma raíz"], a: "Suenan igual, escritura diferente", tipo: "Habilidad Verbal" },
+  { q: "Significado de 'precursor':", options: ["Que precede o va delante", "Que viene después", "Que es muy pequeño", "Que es un experto"], a: "Que precede o va delante", tipo: "Habilidad Verbal" },
+  { q: "¿Cuál es el sinónimo de 'relevante'?", options: ["Importante / Destacado", "Inútil", "Pequeño", "Invisible"], a: "Importante / Destacado", tipo: "Habilidad Verbal" },
+  { q: "Antónimo de 'ascender':", options: ["Descender", "Subir", "Escalar", "Volar"], a: "Descender", tipo: "Habilidad Verbal" },
+  { q: "¿Qué significa 'pernoctar'?", options: ["Pasar la noche en un lugar", "Comer mucho", "Viajar de día", "Dormir poco"], a: "Pasar la noche en un lugar", tipo: "Habilidad Verbal" },
+  { q: "Analogía: 'Frío es a hielo como calor es a...'", options: ["Fuego", "Agua", "Viento", "Tierra"], a: "Fuego", tipo: "Habilidad Verbal" },
+  { q: "Sinónimo de 'vasto':", options: ["Extenso / Amplio", "Estrecho", "Basto (tosco)", "Vacío"], a: "Extenso / Amplio", tipo: "Habilidad Verbal" },
+  { q: "¿Qué es un hiperbatón?", options: ["Alterar el orden lógico de palabras", "Una exageración", "Una repetición", "Un tipo de rima"], a: "Alterar el orden lógico de palabras", tipo: "Habilidad Verbal" },
+  { q: "Significado de 'efímero':", options: ["Que dura muy poco tiempo", "Que es eterno", "Que es muy brillante", "Que es pesado"], a: "Que dura muy poco tiempo", tipo: "Habilidad Verbal" },
+  { q: "Antónimo de 'opaco':", options: ["Brillante / Transparente", "Oscuro", "Triste", "Sólido"], a: "Brillante / Transparente", tipo: "Habilidad Verbal" },
+  { q: "¿Qué es una onomatopeya?", options: ["Representación escrita de un sonido", "Una figura de dicción", "Un nombre de lugar", "Un tipo de verso"], a: "Representación escrita de un sonido", tipo: "Habilidad Verbal" },
+  { q: "Sinónimo de 'enigma':", options: ["Misterio", "Solución", "Claridad", "Historia"], a: "Misterio", tipo: "Habilidad Verbal" },
+  { q: "¿Qué es la denotación?", options: ["Significado literal y objetivo", "Significado subjetivo", "Un error de escritura", "La rima de un poema"], a: "Significado literal y objetivo", tipo: "Habilidad Verbal" },
+  { q: "¿Qué es la connotación?", options: ["Significado subjetivo o figurado", "Significado de diccionario", "La raíz de la palabra", "El plural"], a: "Significado subjetivo o figurado", tipo: "Habilidad Verbal" },
+  { q: "Completa: 'Libro es a leer como película es a...'", options: ["Ver", "Escuchar", "Escribir", "Comer"], a: "Ver", tipo: "Habilidad Verbal" },
+
+  // BLOQUE 5: LITERATURA
+  { q: "¿Quién escribió 'Don Quijote de la Mancha'?", options: ["Miguel de Cervantes", "Lope de Vega", "Quevedo", "Góngora"], a: "Miguel de Cervantes", tipo: "Literatura" },
+  { q: "¿Qué es una rima consonante?", options: ["Coinciden todos los sonidos finales", "Solo coinciden las vocales", "No hay coincidencia", "Solo al principio"], a: "Coinciden todos los sonidos finales", tipo: "Literatura" },
+  { q: "¿Qué es un verso?", options: ["Cada una de las líneas de un poema", "Un conjunto de estrofas", "El título del poema", "La rima final"], a: "Cada una de las líneas de un poema", tipo: "Literatura" },
+  { q: "¿Cómo se llama la comparación que usa la palabra 'como'?", options: ["Símil", "Metáfora", "Hipérbole", "Personificación"], a: "Símil", tipo: "Literatura" },
+  { q: "¿Qué es una hipérbole?", options: ["Una exageración", "Una comparación", "Un sonido", "Una contradicción"], a: "Una exageración", tipo: "Literatura" },
+  { q: "¿Cuál es el tema principal de una tragedia?", options: ["Destino fatal y sufrimiento", "Risa y alegría", "Amor romántico", "Hechos históricos"], a: "Destino fatal y sufrimiento", tipo: "Literatura" },
+  { q: "¿Qué es una moraleja?", options: ["Enseñanza de una fábula", "El final de un cuento", "El nombre del autor", "Un tipo de rima"], a: "Enseñanza de una fábula", tipo: "Literatura" },
+  { q: "¿A qué se refiere el 'clímax' en una historia?", options: ["Punto de mayor tensión", "El inicio", "El final feliz", "La descripción de paisajes"], a: "Punto de mayor tensión", tipo: "Literatura" },
+  { q: "¿Qué es un narrador omnisciente?", options: ["El que sabe todo lo que piensan", "El que es un personaje", "El que solo ve lo de afuera", "El que miente"], a: "El que sabe todo lo que piensan", tipo: "Literatura" },
+  { q: "¿Cuál es la lengua romance de la que proviene el español?", options: ["El latín", "El griego", "El germánico", "El árabe"], a: "El latín", tipo: "Literatura" },
+  { q: "¿Qué es un arcaísmo?", options: ["Palabra que ya no se usa", "Palabra nueva", "Palabra extranjera", "Palabra técnica"], a: "Palabra que ya no se usa", tipo: "Literatura" },
+  { q: "¿Qué autor mexicano ganó el Premio Nobel de Literatura?", options: ["Octavio Paz", "Juan Rulfo", "Carlos Fuentes", "Elena Poniatowska"], a: "Octavio Paz", tipo: "Literatura" },
+  { q: "¿Qué es una estrofa?", options: ["Un conjunto de versos", "Una línea del poema", "La rima asonante", "El autor del poema"], a: "Un conjunto de versos", tipo: "Literatura" },
+  { q: "¿Qué es el género lírico?", options: ["Expresa sentimientos y emociones", "Cuenta hechos históricos", "Se representa en teatro", "Es para enseñar"], a: "Expresa sentimientos y emociones", tipo: "Literatura" },
+  { q: "¿Qué es una paradoja?", options: ["Contradicción aparente con verdad", "Una exageración", "Una rima", "Un personaje"], a: "Contradicción aparente con verdad", tipo: "Literatura" },
+  { q: "¿Cuál es la obra más famosa de Gabriel García Márquez?", options: ["Cien años de soledad", "Pedro Páramo", "Rayuela", "El Aleph"], a: "Cien años de soledad", tipo: "Literatura" },
+  { q: "¿Qué es un pleonasmo?", options: ["Uso de palabras innecesarias", "Una palabra nueva", "Una rima", "Un tipo de verso"], a: "Uso de palabras innecesarias", tipo: "Literatura" },
+  { q: "¿Qué es la rima asonante?", options: ["Solo coinciden las vocales", "Coinciden todos los sonidos", "No hay rima", "Rima al principio"], a: "Solo coinciden las vocales", tipo: "Literatura" },
+  { q: "¿Qué es un ensayo?", options: ["Texto donde el autor expone su punto", "Un poema largo", "Una obra de teatro", "Una noticia"], a: "Texto donde el autor expone su punto", tipo: "Literatura" },
+  { q: "¿Qué signo se usa para introducir un diálogo?", options: ["Raya o guion largo (—)", "Comillas", "Paréntesis", "Puntos suspensivos"], a: "Raya o guion largo (—)", tipo: "Literatura" },
 
   // PREGUNTAS ESPECIALES (Las originales que pidió el usuario)
   { q: "¿Qué nombre recibe el payaso diabólico en 'It'?", options: ["Pennywise", "Joker", "Bozo", "Pogo"], a: "Pennywise", tipo: "Pregunta Especial ⭐" },
