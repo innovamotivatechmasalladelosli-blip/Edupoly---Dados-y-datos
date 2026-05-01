@@ -143,16 +143,65 @@ const GlobalStyles = ({ theme }: { theme: string }) => (
 );
 
 const QUESTION_BANK = [
-  { q: "¿Qué nombre recibe el payaso diabólico en 'It'?", options: ["Pennywise", "Joker", "Bozo", "Pogo"], a: "Pennywise", tipo: "Pregunta Especial ⭐" },
-  { q: "¿En qué hotel se desarrolla 'El Resplandor'?", options: ["Hotel Overlook", "Hotel Stanley", "Motel Bates", "Hotel Cortez"], a: "Hotel Overlook", tipo: "Pregunta Especial ⭐" },
-  { q: "¿Qué escritora secuestra a su autor en 'Misery'?", options: ["Annie Wilkes", "Carrie White", "Rose la Chistera", "Margaret White"], a: "Annie Wilkes", tipo: "Pregunta Especial ⭐" },
-  { q: "¿Cuál es el verdadero nombre de Lord Voldemort?", options: ["Tom Riddle", "Gellert Grindelwald", "Severus Snape", "Lucius Malfoy"], a: "Tom Riddle", tipo: "Pregunta Especial ⭐" },
-  { q: "¿Quién forjó el Anillo Único en 'El Señor de los Anillos'?", options: ["Sauron", "Gandalf", "Frodo", "Morgoth"], a: "Sauron", tipo: "Pregunta Especial ⭐" },
-  { q: "¿Quién es el autor de '1984'?", options: ["George Orwell", "Aldous Huxley", "Ray Bradbury", "Isaac Asimov"], a: "George Orwell", tipo: "Pregunta Especial ⭐" },
-  { q: "En 'Fahrenheit 451', ¿a qué temperatura arden los libros?", options: ["451 grados", "100 grados", "1000 grados", "500 grados"], a: "451 grados", tipo: "Pregunta Especial ⭐" },
-  { q: "¿Quién escribió 'Cien años de soledad'?", options: ["G. García Márquez", "M. Vargas Llosa", "Julio Cortázar", "J.L. Borges"], a: "G. García Márquez", tipo: "Pregunta Especial ⭐" },
-  { q: "¿Quién es el autor de 'El Cuervo'?", options: ["Edgar Allan Poe", "H.P. Lovecraft", "Mary Shelley", "Bram Stoker"], a: "Edgar Allan Poe", tipo: "Pregunta Especial ⭐" },
-  { q: "¿A qué autor pertenece la obra 'Don Quijote de la Mancha'?", options: ["Miguel de Cervantes", "Lope de Vega", "Garcilaso de la Vega", "Francisco de Quevedo"], a: "Miguel de Cervantes", tipo: "Pregunta Especial ⭐" },
+  // Bloque 1: Ortografía y Acentuación
+  { q: "¿Qué tipo de palabra es 'canción' según su acento?", options: ["Aguda", "Grave", "Esdrújula", "Sobresdrújula"], a: "Aguda", tipo: "Ortografía" },
+  { q: "¿Las palabras esdrújulas siempre llevan tilde?", options: ["Sí, siempre", "No, nunca", "A veces", "Solo en plural"], a: "Sí, siempre", tipo: "Ortografía" },
+  { q: "¿Cuál es el antónimo de 'efímero'?", options: ["Eterno o duradero", "Fugaz", "Rápido", "Breve"], a: "Eterno o duradero", tipo: "Habilidad Verbal" },
+  { q: "¿Cómo se escribe correctamente para referirse al lugar?", options: ["Allá", "Halla", "Haya", "Aya"], a: "Allá", tipo: "Ortografía" },
+  { q: "¿Qué palabra está mal escrita?", options: ["Exibir", "Exhibir", "Egibir", "Todas"], a: "Exibir", tipo: "Ortografía" },
+  { q: "¿Cuál es la sílaba tónica en la palabra 'teléfono'?", options: ["Lé", "Te", "Fo", "No"], a: "Lé", tipo: "Ortografía" },
+  { q: "¿Qué es un diptongo?", options: ["La unión de dos vocales en una misma sílaba", "La separación de vocales", "La unión de consonantes", "Tres vocales juntas"], a: "La unión de dos vocales en una misma sílaba", tipo: "Ortografía" },
+  { q: "Escribe el plural de la palabra 'luz'.", options: ["Luces", "Luzes", "Luses", "Lúz"], a: "Luces", tipo: "Ortografía" },
+  { q: "¿Cuál es la forma correcta de expresar que hubo un problema?", options: ["Hubo muchos problemas", "Hubieron muchos problemas", "Habían muchos problemas", "Hay muchos problemas"], a: "Hubo muchos problemas", tipo: "Ortografía" },
+  { q: "¿Lleva tilde la palabra 'fue'?", options: ["No, es un monosílabo", "Sí, siempre", "A veces", "Solo en pasado"], a: "No, es un monosílabo", tipo: "Ortografía" },
+  
+  // Bloque 2: Gramática y Sintaxis
+  { q: "¿Cuál es el núcleo del sujeto en: 'El joven programador terminó el código'?", options: ["Programador", "Joven", "El", "Terminó"], a: "Programador", tipo: "Gramática" },
+  { q: "¿Qué es un adjetivo?", options: ["Una palabra que describe una característica del sustantivo", "La acción de la oración", "Una palabra que une oraciones", "El nombre de un lugar"], a: "Una palabra que describe una característica del sustantivo", tipo: "Gramática" },
+  { q: "En la oración 'María corre rápido', ¿cuál es el adverbio?", options: ["Rápido", "María", "Corre", "Ninguno"], a: "Rápido", tipo: "Gramática" },
+  { q: "¿Qué es el predicado?", options: ["Lo que se dice del sujeto", "Quién realiza la acción", "La parte más importante", "Un tipo de verbo"], a: "Lo que se dice del sujeto", tipo: "Gramática" },
+  { q: "¿Cómo se llama el verbo que no está conjugado y termina en -ar, -er, -ir?", options: ["Infinitivo", "Gerundio", "Participio", "Imperativo"], a: "Infinitivo", tipo: "Gramática" },
+  { q: "¿Cuál es el objeto directo en 'Juan compró un libro'?", options: ["Un libro", "Juan", "Compró", "A Juan"], a: "Un libro", tipo: "Gramática" },
+  { q: "¿Qué categoría gramatical es 'y', 'e', 'ni', 'que'?", options: ["Conjunciones", "Preposiciones", "Adverbios", "Artículos"], a: "Conjunciones", tipo: "Gramática" },
+  { q: "¿Cuál es el tiempo verbal de 'yo comeré'?", options: ["Futuro simple", "Pasado", "Presente", "Copretérito"], a: "Futuro simple", tipo: "Gramática" },
+  { q: "¿Cuál es el sujeto tácito en 'Comimos pizza'?", options: ["Nosotros", "Ellos", "Ustedes", "Yo"], a: "Nosotros", tipo: "Gramática" },
+  { q: "¿Qué es una oración simple?", options: ["La que tiene un solo verbo conjugado", "La que tiene varios verbos", "Una sin verbos", "Una pregunta corta"], a: "La que tiene un solo verbo conjugado", tipo: "Gramática" },
+  
+  // Bloque 3: Comprensión Lectora
+  { q: "¿Cuál es la función principal de un texto informativo?", options: ["Transmitir datos o hechos de manera objetiva", "Persuadir al lector", "Contar una historia", "Expresar sentimientos"], a: "Transmitir datos o hechos de manera objetiva", tipo: "Comprensión Lectora" },
+  { q: "¿Qué es una paráfrasis?", options: ["Explicar un texto con tus propias palabras", "Copiar un texto exactamente", "Resumir en una sola palabra", "Traducir a otro idioma"], a: "Explicar un texto con tus propias palabras", tipo: "Comprensión Lectora" },
+  { q: "¿Cuál es el objetivo de un texto argumentativo?", options: ["Persuadir o convencer al lector", "Dar instrucciones", "Hacer reír", "Informar noticias"], a: "Persuadir o convencer al lector", tipo: "Comprensión Lectora" },
+  { q: "¿Qué es una idea principal?", options: ["La información más importante", "Un detalle extra", "La introducción", "La conclusión"], a: "La información más importante", tipo: "Comprensión Lectora" },
+  { q: "¿A qué género pertenece una novela?", options: ["Género narrativo", "Género lírico", "Género dramático", "Género periodístico"], a: "Género narrativo", tipo: "Comprensión Lectora" },
+  { q: "¿Qué función de la lengua predomina en un poema?", options: ["Poética o estética", "Apelativa", "Referencial", "Fática"], a: "Poética o estética", tipo: "Comprensión Lectora" },
+  { q: "¿Qué es un desenlace?", options: ["La parte final donde se resuelve el conflicto", "El inicio de la historia", "El punto de mayor tensión", "El diálogo de los personajes"], a: "La parte final donde se resuelve el conflicto", tipo: "Comprensión Lectora" },
+  { q: "¿Qué es la denotación?", options: ["El significado literal y objetivo", "El significado figurado", "Un doble sentido", "Una exageración"], a: "El significado literal y objetivo", tipo: "Habilidad Verbal" },
+  { q: "¿Cuál es el sinónimo de 'abundante'?", options: ["Copioso o profuso", "Escaso", "Poco", "Raro"], a: "Copioso o profuso", tipo: "Habilidad Verbal" },
+  { q: "¿Qué tipo de palabra es 'árbol'?", options: ["Grave o llana", "Aguda", "Esdrújula", "Sobresdrújula"], a: "Grave o llana", tipo: "Ortografía" },
+  
+  // Bloque 4: Habilidad Verbal y Vocabulario
+  { q: "Completa la analogía: 'Aleta es a pez, como brazo es a...'", options: ["Humano", "Ave", "Gato", "Perro"], a: "Humano", tipo: "Habilidad Verbal" },
+  { q: "¿Cuál es el antónimo de 'altruista'?", options: ["Egoísta", "Generoso", "Amable", "Solidario"], a: "Egoísta", tipo: "Habilidad Verbal" },
+  { q: "Sinónimo de 'vasto':", options: ["Extenso / Amplio", "Pequeño", "Corto", "Tosco"], a: "Extenso / Amplio", tipo: "Habilidad Verbal" },
+  { q: "¿Qué significa la palabra 'ambiguo'?", options: ["Que puede entenderse de varias formas", "Que es muy claro", "Que es antiguo", "Que es grande"], a: "Que puede entenderse de varias formas", tipo: "Habilidad Verbal" },
+  { q: "Antónimo de 'guerra':", options: ["Paz", "Batalla", "Conflicto", "Armonía"], a: "Paz", tipo: "Habilidad Verbal" },
+  { q: "¿Qué es un homófono?", options: ["Palabras que suenan igual pero se escriben diferente", "Palabras con el mismo significado", "Palabras que se escriben igual", "Palabras opuestas"], a: "Palabras que suenan igual pero se escriben diferente", tipo: "Habilidad Verbal" },
+  { q: "¿Qué es un palíndromo?", options: ["Palabra que se lee igual de adelante hacia atrás", "Una palabra antigua", "Un tipo de rima", "Una palabra compuesta"], a: "Palabra que se lee igual de adelante hacia atrás", tipo: "Habilidad Verbal" },
+  { q: "¿Cuándo se usa la letra 'H'?", options: ["En palabras que empiezan por hie-, hue-", "En todas las vocales", "Al final de las agudas", "Nunca"], a: "En palabras que empiezan por hie-, hue-", tipo: "Ortografía" },
+  { q: "¿Qué acento diferencia palabras que se escriben igual pero significan distinto?", options: ["Acento diacrítico", "Acento ortográfico", "Acento prosódico", "Acento tonal"], a: "Acento diacrítico", tipo: "Ortografía" },
+  { q: "¿Qué función cumple la preposición 'de' en 'la casa de madera'?", options: ["Indica pertenencia o material", "Indica tiempo", "Indica lugar", "Es una acción"], a: "Indica pertenencia o material", tipo: "Gramática" },
+  
+  // Bloque 5: Literatura y Cultura Lingüística
+  { q: "¿Quién escribió 'Don Quijote de la Mancha'?", options: ["Miguel de Cervantes", "García Márquez", "Octavio Paz", "William Shakespeare"], a: "Miguel de Cervantes", tipo: "Literatura" },
+  { q: "¿Qué es un verso?", options: ["Cada una de las líneas de un poema", "Un conjunto de poemas", "Un cuento corto", "El título de la obra"], a: "Cada una de las líneas de un poema", tipo: "Literatura" },
+  { q: "¿Qué es una hipérbole?", options: ["Una exageración", "Una comparación", "Un sonido", "Una mentira"], a: "Una exageración", tipo: "Literatura" },
+  { q: "¿Cuál es el tema principal de una tragedia?", options: ["El destino fatal y el sufrimiento", "El amor feliz", "La comedia", "La aventura épica"], a: "El destino fatal y el sufrimiento", tipo: "Literatura" },
+  { q: "¿Qué es una moraleja?", options: ["Enseñanza que se extrae de una fábula", "El final de un poema", "Un chiste", "Un tipo de rima"], a: "Enseñanza que se extrae de una fábula", tipo: "Literatura" },
+  { q: "¿A qué se refiere el 'clímax' en una historia?", options: ["Al punto de mayor tensión", "Al inicio", "A la presentación de personajes", "Al final feliz"], a: "Al punto de mayor tensión", tipo: "Literatura" },
+  { q: "¿Quién es el autor de '1984'?", options: ["George Orwell", "Aldous Huxley", "Ray Bradbury", "Isaac Asimov"], a: "George Orwell", tipo: "Literatura" },
+  { q: "En 'Fahrenheit 451', ¿a qué temperatura arden los libros?", options: ["451 grados", "100 grados", "1000 grados", "500 grados"], a: "451 grados", tipo: "Literatura" },
+  { q: "¿Quién escribió 'Cien años de soledad'?", options: ["G. García Márquez", "M. Vargas Llosa", "Julio Cortázar", "J.L. Borges"], a: "G. García Márquez", tipo: "Literatura" },
+  { q: "¿Quién es el autor de 'El Cuervo'?", options: ["Edgar Allan Poe", "H.P. Lovecraft", "Mary Shelley", "Bram Stoker"], a: "Edgar Allan Poe", tipo: "Literatura" },
 ];
 
 const AVATAR_SHOP = [
@@ -163,11 +212,6 @@ const AVATAR_SHOP = [
 const TOKEN_SHOP = [
   { id: 'tk1', name: "Peón", icon: "♟️", type: "pawn", price: 0 },
   { id: 'tk2', name: "Corona", icon: "👑", type: "pawn", price: 0 },
-];
-
-const BOARD_DATA = [
-  { id: 0, name: "INICIO", type: "start", color: "bg-emerald-400", icon: "🏁", desc: "Recibes $200 al pasar." },
-  { id: 1, name: "CARRIE", type: "prop", price: 100, rent: 40, color: "bg-rose-500", icon: "📚" },
 ];
 
 export default function Game() {
@@ -181,20 +225,51 @@ export default function Game() {
   return (
     <div className="w-full h-screen" style={{ backgroundColor: theme === 'dark' ? '#0f172a' : '#f0fdf4', color: theme === 'dark' ? '#f8fafc' : '#1e293b' }}>
       <GlobalStyles theme={theme} />
-      <div className="w-full h-full flex items-center justify-center">
-        <div className="text-center">
+      <div className="w-full h-full flex items-center justify-center p-4">
+        <div className="text-center max-w-2xl">
           <div className="text-8xl mb-4 float-anim">🎓</div>
-          <h1 className="text-5xl font-black mb-4 title-anim" style={{ fontFamily: "'Playfair Display', serif" }}>
+          <h1 className="text-5xl sm:text-6xl font-black mb-2 title-anim" style={{ fontFamily: "'Playfair Display', serif" }}>
             EXAMEN<span style={{ color: '#10b981' }}>-POLY</span>
           </h1>
-          <p className="text-xl opacity-70 mb-8">Ultimate Edition - Estudio y Diversión</p>
-          <button 
-            onClick={() => { sfx.magic(); setTheme(theme === 'dark' ? 'light' : 'dark'); }}
-            className="px-8 py-4 rounded-2xl border-2 border-emerald-500/40 bg-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all"
-            style={{ color: '#10b981' }}
-          >
-            🎮 Cargar Juego
-          </button>
+          <p className="text-lg sm:text-xl opacity-70 mb-2">Ultimate Edition</p>
+          <p className="text-base sm:text-lg opacity-60 mb-8">Estudio y Diversión</p>
+          
+          <div className="glass-panel p-8 rounded-3xl mb-8">
+            <h2 className="text-2xl font-bold mb-6" style={{ color: '#10b981' }}>¿Qué es Examen-Poly?</h2>
+            <p className="text-sm sm:text-base opacity-80 mb-4">
+              Un videojuego educativo diseñado para estudiar de forma menos dolorosa para COMIPEMS o CENEVAL.
+            </p>
+            <p className="text-sm sm:text-base opacity-80 mb-4">
+              <strong>100 preguntas</strong> divididas en 5 bloques temáticos:
+            </p>
+            <ul className="text-left text-sm opacity-75 space-y-2 mb-4">
+              <li>📘 <strong>Bloque 1:</strong> Ortografía y Acentuación</li>
+              <li>📗 <strong>Bloque 2:</strong> Gramática y Sintaxis</li>
+              <li>📙 <strong>Bloque 3:</strong> Comprensión Lectora</li>
+              <li>📕 <strong>Bloque 4:</strong> Habilidad Verbal y Vocabulario</li>
+              <li>📓 <strong>Bloque 5:</strong> Literatura y Cultura Lingüística</li>
+            </ul>
+          </div>
+
+          <div className="space-y-3">
+            <button 
+              onClick={() => { sfx.magic(); setTheme(theme === 'dark' ? 'light' : 'dark'); }}
+              className="w-full px-8 py-4 rounded-2xl border-2 border-emerald-500/40 bg-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all font-bold"
+              style={{ color: '#10b981' }}
+            >
+              🎮 Jugar Ahora
+            </button>
+            <button 
+              onClick={() => { sfx.click(); }}
+              className="w-full px-8 py-3 rounded-2xl border border-white/20 bg-white/5 hover:bg-white/10 transition-all font-bold opacity-70 hover:opacity-100"
+            >
+              📖 Ver Preguntas
+            </button>
+          </div>
+
+          <p className="text-xs opacity-50 mt-8">
+            Proyecto educativo - Versión 1.0
+          </p>
         </div>
       </div>
     </div>
