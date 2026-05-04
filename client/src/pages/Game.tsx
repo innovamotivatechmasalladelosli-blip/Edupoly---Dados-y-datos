@@ -104,43 +104,13 @@ const musicEngine = {
   stop: function () { clearInterval(this.interval); this.currentMode = null; }
 };
 
-// --- ESTILOS GLOBALES ---
-const GlobalStyles = ({ theme }: { theme: string }) => (
-  <style>{`
-    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap');
-    :root {
-      --bg-color: ${theme === 'dark' ? '#0f172a' : '#f0fdf4'};
-      --text-color: ${theme === 'dark' ? '#f8fafc' : '#1e293b'};
-      --panel-bg: ${theme === 'dark' ? 'rgba(30, 41, 59, 0.75)' : 'rgba(255, 255, 255, 0.85)'};
-      --panel-border: ${theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'};
-      --panel-shadow: ${theme === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.15)'};
-      --accent-color: ${theme === 'dark' ? 'rgba(0,0,0,0.4)' : 'rgba(0,0,0,0.05)'};
-    }
-    body { font-family: 'Nunito', sans-serif; background-color: var(--bg-color); color: var(--text-color); overflow: hidden; margin: 0; padding: 0; touch-action: none; transition: background-color 0.5s ease, color 0.5s ease; }
-    @keyframes title-wave { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-8px) rotate(2deg); } }
-    @keyframes pop-in { 0% { transform: scale(0.8) translateY(20px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
-    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-    @keyframes float-slow { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-15px) rotate(5deg); } }
-    @keyframes glow-pulse { 0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.3), inset 0 0 10px rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.5); } 50% { box-shadow: 0 0 25px rgba(16, 185, 129, 0.7), inset 0 0 20px rgba(16, 185, 129, 0.4); border-color: rgba(16, 185, 129, 1); } }
-    @keyframes throw { 0% { transform: translateY(0) scale(1); } 50% { transform: translateY(-40px) scale(1.1) rotate(15deg); } 100% { transform: translateY(0) scale(1) rotate(0deg); } }
-    .title-anim { animation: title-wave 4s ease-in-out infinite; } .pop-in { animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-    .float-anim { animation: float 4s ease-in-out infinite; } .float-slow { animation: float-slow 6s ease-in-out infinite; }
-    .turn-glow { animation: glow-pulse 2s infinite; } .anim-throw { animation: throw 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
-    .anime-speed-lines { background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0.1) 0deg 5deg, transparent 5deg 15deg); animation: spin-speed 1.5s linear infinite; }
-    @keyframes spin-speed { 100% { transform: rotate(360deg); } }
-    .glass-panel { background: var(--panel-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--panel-border); box-shadow: 0 15px 35px var(--panel-shadow); transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
-    .inner-module { background: var(--accent-color); border: 1px solid var(--panel-border); }
-    .no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    .mask-linear-right { -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%); mask-image: linear-gradient(to right, black 85%, transparent 100%); }
-    .uno-card { background-size: 200% 200%; box-shadow: -5px 10px 20px rgba(0,0,0,0.3), inset 0 0 0 6px white; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); color: white; }
-    .uno-card-inner { background: rgba(255,255,255,0.15); transform: skewY(-10deg); box-shadow: inset 0 0 20px rgba(0,0,0,0.1); }
-    .custom-scroll::-webkit-scrollbar { width: 8px; } .custom-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; } .custom-scroll::-webkit-scrollbar-thumb { background: rgba(16,185,129,0.5); border-radius: 10px; } .custom-scroll::-webkit-scrollbar-thumb:hover { background: rgba(16,185,129,0.8); }
-    input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
-    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: #10b981; cursor: pointer; margin-top: -8px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-    input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: rgba(255,255,255,0.2); border-radius: 10px; border: 1px solid rgba(0,0,0,0.1); }
-    .light-theme input[type=range]::-webkit-slider-runnable-track { background: rgba(0,0,0,0.1); }
-  `}</style>
-);
+// DATOS DEL JUEGO
+const BOARD_SHOP = [
+  { id: 'b_classic', name: "Clásico", icon: "🏛️", price: 0, desc: "Elegante y limpio, con un fino tablero de madera.", colors: { bg1: '#0f172a', bg2: '#020617', boardTop: '#e2e8f0', wall: ['#64748b', '#94a3b8', '#64748b', '#94a3b8'], boardBorder: '#cbd5e1', fog: 'rgba(2, 6, 23, 0.9)', particle: 'rgba(251, 191, 36, 0.4)', textBase: '#1e293b' } },
+  { id: 'b_neon', name: "Cyber Neón", icon: "🌃", price: 800, desc: "Suelo de cuadrícula y luces de neón en la red digital.", colors: { bg1: '#09090b', bg2: '#000000', boardTop: '#18181b', wall: ['#db2777', '#be185d', '#db2777', '#be185d'], boardBorder: '#f472b6', fog: 'rgba(0, 0, 0, 0.95)', particle: 'rgba(244, 114, 182, 0.8)', textBase: '#fdf2f8' } },
+  { id: 'b_forest', name: "Bosque Mágico", icon: "🌲", price: 1200, desc: "Suelo terroso, pinos espesos y luciérnagas mágicas.", colors: { bg1: '#064e3b', bg2: '#022c22', boardTop: '#dcfce7', wall: ['#059669', '#10b981', '#059669', '#10b981'], boardBorder: '#34d399', fog: 'rgba(2, 44, 34, 0.95)', particle: 'rgba(167, 243, 208, 0.6)', textBase: '#064e3b' } },
+  { id: 'b_lava', name: "Infierno", icon: "🌋", price: 2000, desc: "Suelo resquebrajado ardiente y magma oscuro.", colors: { bg1: '#450a0a', bg2: '#2c0606', boardTop: '#262626', wall: ['#dc2626', '#ef4444', '#dc2626', '#ef4444'], boardBorder: '#f87171', fog: 'rgba(44, 6, 6, 0.98)', particle: 'rgba(251, 146, 60, 0.9)', textBase: '#fef2f2' } }
+];
 
 const QUESTION_BANK = [
   { q: "¿Qué nombre recibe el payaso diabólico en 'It'?", options: ["Pennywise", "Joker", "Bozo", "Pogo"], a: "Pennywise", tipo: "Pregunta Especial ⭐" },
@@ -162,15 +132,55 @@ const QUESTION_BANK = [
 
 export default function Game() {
   const [theme, setTheme] = useState('dark');
+  const [gameStarted, setGameStarted] = useState(false);
   
   useEffect(() => {
     initAudio();
     musicEngine.play('menu');
+    return () => musicEngine.stop();
   }, []);
 
+  const handleStartGame = () => {
+    sfx.magic();
+    setGameStarted(true);
+    musicEngine.play('game', 'b_classic');
+  };
+
+  const handleThemeToggle = () => {
+    sfx.magic();
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
+  if (gameStarted) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center" style={{ backgroundColor: theme === 'dark' ? '#0f172a' : '#f0fdf4' }}>
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4">Juego en Desarrollo</h1>
+          <p className="opacity-70 mb-6">La lógica completa del juego se está implementando...</p>
+          <button 
+            onClick={() => { setGameStarted(false); musicEngine.play('menu'); }}
+            className="px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg font-bold transition-all"
+          >
+            Volver al Menú
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full h-screen" style={{ backgroundColor: theme === 'dark' ? '#0f172a' : '#f0fdf4', color: theme === 'dark' ? '#f8fafc' : '#1e293b' }}>
-      <GlobalStyles theme={theme} />
+    <div className="w-full h-screen overflow-hidden" style={{ backgroundColor: theme === 'dark' ? '#0f172a' : '#f0fdf4', color: theme === 'dark' ? '#f8fafc' : '#1e293b' }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap');
+        @keyframes title-wave { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-8px) rotate(2deg); } }
+        @keyframes pop-in { 0% { transform: scale(0.8) translateY(20px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .title-anim { animation: title-wave 4s ease-in-out infinite; }
+        .pop-in { animation: pop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .float-anim { animation: float 4s ease-in-out infinite; }
+        .glass-panel { background: ${theme === 'dark' ? 'rgba(30, 41, 59, 0.75)' : 'rgba(255, 255, 255, 0.85)'}; backdrop-filter: blur(20px); border: 1px solid ${theme === 'dark' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)'}; box-shadow: 0 15px 35px ${theme === 'dark' ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.15)'}; }
+      `}</style>
+      
       <div className="w-full h-full flex items-center justify-center p-4">
         <div className="text-center max-w-2xl">
           <div className="text-8xl mb-4 float-anim">🎓</div>
@@ -199,17 +209,17 @@ export default function Game() {
 
           <div className="space-y-3">
             <button 
-              onClick={() => { sfx.magic(); setTheme(theme === 'dark' ? 'light' : 'dark'); }}
+              onClick={handleStartGame}
               className="w-full px-8 py-4 rounded-2xl border-2 border-emerald-500/40 bg-emerald-500/20 hover:bg-emerald-500 hover:text-white transition-all font-bold"
               style={{ color: '#10b981' }}
             >
               🎮 Jugar Ahora
             </button>
             <button 
-              onClick={() => { sfx.click(); }}
+              onClick={handleThemeToggle}
               className="w-full px-8 py-3 rounded-2xl border border-white/20 bg-white/5 hover:bg-white/10 transition-all font-bold opacity-70 hover:opacity-100"
             >
-              📖 Ver Preguntas
+              {theme === 'dark' ? '☀️' : '🌙'} Cambiar Tema
             </button>
           </div>
 
